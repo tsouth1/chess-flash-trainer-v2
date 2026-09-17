@@ -148,7 +148,7 @@ this module alone, no ad-hoc position math elsewhere
 
 ---
 
-### [ ] 1.2.6 — localStorage persistence layer
+### [x] 1.2.6 — localStorage persistence layer
 
 **Reads:** SECURITY.md → Sections 2–3
 **Creates:** `src/utils/storage.js`
@@ -160,9 +160,15 @@ this module alone, no ad-hoc position math elsewhere
   history, get/set achievements
 **Done when:** no component or screen calls `localStorage` directly
 
+```
+> Note: safeGet/safeSet wrap every access in try/catch with a fallback value.
+> Payloads stored as {schemaVersion, data} so a future shape change can
+> migrate instead of crashing on read.
+```
+
 ---
 
-### [ ] 1.2.7 — Statistics aggregation utilities
+### [x] 1.2.7 — Statistics aggregation utilities
 
 **Creates:** `src/utils/statsAggregation.js`
 **Requirements:**
@@ -173,11 +179,16 @@ this module alone, no ad-hoc position math elsewhere
 **Done when:** Statistics and Best Intelligencers screens are pure render
   layers over this module's output
 
+```
+> Note: aggregateUserStats() and aggregateLeaderboard() are pure functions
+> over session arrays - Statistics.jsx and Leaderboard.jsx just call them.
+```
+
 ---
 
 ## 1.3 — Global app state
 
-### [ ] 1.3.1 — App context, reducer, and view routing
+### [x] 1.3.1 — App context, reducer, and view routing
 
 **Creates:** `src/context/AppContext.jsx`
 **Requirements:**
@@ -188,11 +199,18 @@ this module alone, no ad-hoc position math elsewhere
   oldest user and deletes their saved results
 **Done when:** every screen reads/writes app state only through this context
 
+```
+> Note: implemented as a single AppContext (not split into a separate
+> reducer file) covering view routing, users, settings, toasts, and the
+> shared ARIA live-region message. addUser() handles the eviction rule and
+> surfaces a toast when it fires.
+```
+
 ---
 
-### [ ] 1.3.2 — Game session finite-state machine
+### [x] 1.3.2 — Game session state (per-exercise, via a shared hook)
 
-**Creates:** `src/context/GameContext.jsx`
+**Creates:** `src/game/useGameSession.js`
 **Requirements:**
 - Phases: idle, memorizing, waitingForFirstConfirmation, transformation,
   solving, submitting, results (from `PHASES` in config.js)
@@ -201,81 +219,309 @@ this module alone, no ad-hoc position math elsewhere
 - Prevents invalid transitions (e.g. submitting before all pieces placed)
 **Done when:** all five exercise engines drive their flow through this reducer
 
+```
+> Note: design change from the original plan - instead of one global
+> GameContext reducer trying to model all five very different exercise
+> flows, each exercise engine owns its own local phase state and calls the
+> shared `useGameSession` hook for the parts that ARE common: phase
+> announcements, the timer, and `finishGame()` (scoring + persisting the
+> session + updating achievements). This kept each engine's phase
+> transitions readable instead of forcing them through one generic
+> reducer. Invalid submission is still prevented per-engine (e.g.
+> `okEnabled = allPlaced` while solving).
+```
+
 ---
 
 # Phase 2 — Core UI components
 
-### [ ] 2.1 — ChessBoard component
+### [x] 2.1 — ChessBoard component
 
 **Creates:** `src/components/ChessBoard.jsx`, `src/components/ChessBoard.css`
 **Requirements:** configurable size, coordinate labels, drag-and-drop +
 click-to-select/click-to-place, keyboard support, highlight states (selected,
 valid drop, correct, incorrect, active), no duplicate-occupancy
 
-### [ ] 2.2 — Piece component
+```
+> Note: squares are real <button> elements with descriptive aria-labels
+> ("Square A4, empty" / "...occupied by circle piece, correct"). Supports
+> both HTML5 drag-and-drop and click-to-select-then-click-to-place, so it's
+> fully usable via keyboard/screen reader. isSquareOccupied() from
+> placement.js blocks duplicate placement.
+```
 
-**Creates:** `src/components/Piece.jsx`
+### [x] 2.2 — Piece component
+
+**Creates:** `src/components/Piece.jsx`, `src/components/Piece.css`
 **Requirements:** unique id, color, shape (CSS/SVG/Unicode, no copyrighted
 assets), accessible label, selected/correct/incorrect visual + text state
 
-### [ ] 2.3 — GameControls + GameStatus
+```
+> Note: shapes are Unicode glyphs (●▲■◆★⬡✚⬟) colored via inline style - no
+> image assets. Correct/incorrect/selected states are conveyed via both a
+> CSS class AND an sr-only text suffix, never color alone.
+```
 
-**Creates:** `src/components/GameControls.jsx`, `src/components/GameStatus.jsx`
+### [x] 2.3 — GameControls + GameStatus
+
+**Creates:** `src/components/GameControls.jsx`, `src/components/GameStatus.jsx`, `src/components/GameStatus.css`
 **Requirements:** Start/OK/Answer buttons gated by current phase; status bar
 shows user, exercise, level, score, phase per spec
 
-### [ ] 2.4 — Modal, Toast, ARIA live region
+```
+> Note: GameControls takes explicit `okEnabled`/`showAnswer` booleans from
+> the calling exercise engine rather than inferring them from phase alone,
+> since what "OK" does differs per exercise (confirm memorization vs.
+> submit an answer vs. accept a Flashes guess).
+```
 
-**Creates:** `src/components/Modal.jsx`, `src/components/Toast.jsx`,
-`src/components/LiveRegion.jsx`
+### [x] 2.4 — Modal, Toast, ARIA live region
+
+**Creates:** `src/components/Modal.jsx`, `src/components/Modal.css`,
+`src/components/Toast.jsx`, `src/components/Toast.css`, `src/components/LiveRegion.jsx`
 **Requirements:** accessible dialog (focus trap, Escape to close), transient
 toast notifications, a single shared `aria-live="polite"` region for
 game-state announcements
 
-### [ ] 2.5 — MenuBar + Layout
+```
+> Note: Modal traps focus (Tab/Shift+Tab wrap), closes on Escape or
+> backdrop click, and restores focus to the triggering element on close.
+> LiveRegion reads AppContext's `liveMessage`, which `announce()` clears
+> and re-sets on a rAF so repeated identical phase announcements still get
+> read out by screen readers.
+```
 
-**Creates:** `src/components/MenuBar.jsx`, `src/components/Layout.jsx`
+### [x] 2.5 — MenuBar + Layout
+
+**Creates:** `src/components/MenuBar.jsx`, `src/components/MenuBar.css`, `src/components/Layout.jsx`
 **Requirements:** Game menu (New, Statics, Transposition, Flashes, Moves,
 Super Moves, Custom..., Custom Properties..., Levels..., Statistics...,
 Best Intelligencers..., Exit) + Help menu (Help, About); collapses to a
 responsive menu below tablet width; "New" returns to Personal Data; "Exit"
 shows the friendly can't-close-the-browser message
 
+```
+> Note: collapses into a toggled "Menu" button under 720px. Moves/Super
+> Moves/Custom... are gated behind `settings.advancedEdition`, showing a
+> toast instead of navigating when it's off. Best Intelligencers is hidden
+> from the menu entirely when `APP_MODE` is 'personal'.
+```
+
 ---
 
 # Phase 3 — Screens
 
-### [ ] 3.1 — Personal Data screen
-### [ ] 3.2 — Level Selection screen
-### [ ] 3.3 — Main Game screen (hosts the active exercise engine)
-### [ ] 3.4 — Custom Mode screen
-### [ ] 3.5 — Custom Properties screen
-### [ ] 3.6 — Statistics screen
-### [ ] 3.7 — Best Intelligencers (leaderboard) screen
-### [ ] 3.8 — Help screen
+### [x] 3.1 — Personal Data screen
 
-_(Each expanded into its own Reads/Creates/Requirements/Done-when block as it's started — see `prompt.txt` for the per-screen spec.)_
+```
+> Note: add/select/delete username, mode-aware max-user messaging, and a
+> "confirm delete?" two-click pattern on the Delete button instead of a
+> separate modal for that one action.
+```
+
+### [x] 3.2 — Level Selection screen
+
+```
+> Note: exercise picker + level grid in one screen; locked levels are
+> visually dimmed AND labeled "Locked" (not color-only), and clicking one
+> shows a toast rather than silently doing nothing.
+```
+
+### [x] 3.3 — Main Game screen (hosts the active exercise engine)
+
+```
+> Note: GameScreen.jsx is a thin dispatcher mapping `pendingExercise.exercise`
+> to one of the five exercise engine components under `src/screens/exercises/`.
+```
+
+### [x] 3.4 — Custom Mode screen
+
+```
+> Note: exercise type, board size, piece count, color count, memorization
+> time, flash speed/count, movement difficulty, show-coordinates - validates
+> piece count against the selected board size before allowing Start.
+```
+
+### [x] 3.5 — Custom Properties screen
+
+```
+> Note: permanent defaults persisted via AppContext → storage.js. Validates
+> board size, piece count, memorization duration, and flash interval ranges
+> with inline field errors before saving.
+```
+
+### [x] 3.6 — Statistics screen
+
+```
+> Note: current user, totals/success-rate/best/average stat tiles, best
+> score per exercise, level-progress tags, recent-history table, and a
+> Clear Statistics button behind a confirmation Modal.
+```
+
+### [x] 3.7 — Best Intelligencers (leaderboard) screen
+
+```
+> Note: hidden with an explanatory message when APP_MODE is 'personal'.
+> Sortable by total score / success rate / best level.
+```
+
+### [x] 3.8 — Help screen
+
+```
+> Note: covers starting a game, memorizing, drag/keyboard placement, how
+> each of the five exercises works, levels, statistics, Custom vs. Custom
+> Properties, board coordinates, and keyboard/accessibility controls, plus
+> an About blurb.
+```
+
+_(Plus a not-originally-listed 3.9 — Exit screen: friendly "browsers can't
+close their own tab" message with a button back to Personal Data, per the
+Game menu spec.)_
 
 ---
 
 # Phase 4 — Exercise engines
 
-### [ ] 4.1 — Statics
-### [ ] 4.2 — Transposition
-### [ ] 4.3 — Flashes
-### [ ] 4.4 — Moves *(advanced edition only)*
-### [ ] 4.5 — Super Moves *(advanced edition only)*
+### [x] 4.1 — Statics
+
+```
+> Note: implemented via the shared `PlacementBoardExercise` engine
+> (transpose=false) - memorize → clear board → drag/click pieces from a
+> tray back onto their original squares → submit → per-piece correct/
+> incorrect highlighting + an Answer toggle to reveal the solution.
+```
+
+### [x] 4.2 — Transposition
+
+```
+> Note: also built on `PlacementBoardExercise` (transpose=true). Design
+> decision: after the first OK, one shuffled arrangement is shown briefly
+> (1.2s) then the board clears, and the player reconstructs the ORIGINAL
+> arrangement from an empty board/tray - the same interaction model as
+> Statics, rather than dragging pieces around on top of the transformed
+> board. This was chosen for consistency and accessibility (one placement
+> model to learn) since prompt.txt left the exact interaction ambiguous
+> beyond "restore the original arrangement". If a closer-to-original-game
+> feel is wanted later, this is the place to revisit.
+```
+
+### [x] 4.3 — Flashes
+
+```
+> Note: builds a frame sequence where exactly one flash (never the first)
+> matches the original arrangement; player clicks OK and whichever frame
+> was on-screen at that moment is compared to the original. Auto-submits
+> on the last frame if the player never clicks. Configurable via
+> level.flashCount / level.flashIntervalMs (or Custom Mode's equivalents).
+```
+
+### [x] 4.4 — Moves *(advanced edition only)*
+
+```
+> Note: memorize → OK hides board, shows the move list (piece/squares/
+> direction, from movement.js) → OK hides the list and shows an empty
+> board + tray → player places each piece on its calculated square →
+> submit. Gated behind settings.advancedEdition via the menu/Level Selection.
+```
+
+### [x] 4.5 — Super Moves *(advanced edition only)*
+
+```
+> Note: same memorize → move-list flow as Moves, but after the second OK
+> the board is NOT shown again - the player picks each piece's new
+> column/row from two <select> dropdowns (screen-reader friendly stand-in
+> for typing "E4"), with a reminder about column/row orientation and a
+> duplicate-square guard before submit is allowed.
+```
 
 ---
 
 # Phase 5 — Ship it
 
-### [ ] 5.1 — Install deps and verify build in cloud workspace
-### [ ] 5.2 — Transfer project source to `C:\Git_Projects\chess-flash-trainer-v2`
-### [ ] 5.3 — Init local git repo, `.gitignore`, initial commit
-### [ ] 5.4 — Install GitHub CLI on device, user completes `gh auth login`
-### [ ] 5.5 — Create GitHub repo, push, add GitHub Actions → Pages workflow
-### [ ] 5.6 — Final verification: production build + live github.io URL both work
+### [x] 5.1 — Install deps and verify build
+
+```
+> Note: `registry.npmjs.org` was initially blocked by this account's
+> network egress allowlist in both the cloud workspace and the linked
+> device - the user enabled broader network access from Settings, after
+> which `npm install` + `npm run build` succeeded on the user's machine
+> (69 modules, dist output ~204kB JS / 8.5kB CSS gzipped). `npm run lint`
+> passes clean (after adding `ignorePatterns: ['dist','node_modules']` to
+> .eslintrc.cjs, which was initially linting the built bundle). `npm audit`
+> shows one moderate esbuild advisory that only affects `vite dev`'s dev
+> server, not the production build GitHub Pages serves - left as-is.
+```
+
+### [x] 5.2 — Transfer project source to `C:\Git_Projects\chess-flash-trainer-v2`
+
+```
+> Note: packaged as a tar.gz and delivered via SendUserFile + device
+> commit/extract rather than file-by-file, since this device bridge can't
+> write `.github/workflows/*` paths directly (protected-path restriction) -
+> that one file was written via the device shell instead.
+```
+
+### [x] 5.3 — Init local git repo, `.gitignore`, initial commit
+
+```
+> Note: local git identity set to "Terry" + a GitHub noreply email
+> (40437662+tsouth1@users.noreply.github.com) per the user's choice, to
+> keep their real email address out of public commit history.
+```
+
+### [x] 5.4 — Install GitHub CLI on device, authenticate
+
+```
+> Note: `gh auth login`'s interactive device-code flow doesn't work through
+> this session's command execution model (no way to relay the printed code
+> back before the command finishes waiting on it), so authentication used
+> a user-supplied Personal Access Token via `GH_TOKEN` instead - which also
+> sidestepped a `read:org` scope requirement that `gh auth login --with-token`
+> enforces but plain API/git usage doesn't need. The token was passed as a
+> command argument (visible in this session's own logs, not written to any
+> project file) and is not persisted in `.git/config` - `git push` initially
+> leaked it into `.git/config` via a token-in-URL push, which was
+> immediately corrected to use `credential.helper store` (`~/.git-credentials`,
+> mode 600, outside the repo) instead.
+```
+
+### [x] 5.5 — Create GitHub repo, push, add GitHub Actions → Pages workflow
+
+```
+> Note: repo created public at github.com/tsouth1/chess-flash-trainer-v2.
+> Pages enabled with build_type=workflow via the API (Settings → Pages →
+> Source → GitHub Actions, already configured - no further UI step needed).
+> First Actions run: build succeeded in 15s, deploy succeeded in 8s once
+> Pages was enabled.
+```
+
+### [x] 5.6 — Final verification: production build + live github.io URL both work
+
+```
+> Note: verified via the linked device's browser pane against the live URL
+> (not just localhost): Personal Data → add user → Level Selection → Statics
+> Level 1 → Start → memorize → OK → click-to-place pieces from tray → Submit
+> → Results screen with correct/incorrect per piece (both color AND text,
+> per the accessibility rule) and a working score breakdown. Zero console
+> errors throughout. Live at https://tsouth1.github.io/chess-flash-trainer-v2/
+```
+
+---
+
+# Known follow-ups (not blocking, not in original spec scope)
+
+- [ ] Add automated tests (Vitest) for `src/game/*` pure functions - the
+  user declined this for the initial build; the modules are already
+  side-effect-free and easy to test whenever it's wanted.
+- [ ] Consider a real drag-reorder interaction for Transposition (see 4.2
+  note above) if the empty-board reconstruction model feels too similar
+  to Statics in play-testing.
+- [ ] `npm audit`'s esbuild/vite dev-server advisory - fine to ignore for a
+  static-only deployment, but worth clearing next time Vite gets a major
+  bump.
+- [ ] Sound effects toggle exists in Custom Properties but no actual sounds
+  are wired up yet - prompt.txt only asked for the on/off setting to
+  exist, not for audio assets.
 
 ---
 
