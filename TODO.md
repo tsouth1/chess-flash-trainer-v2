@@ -543,6 +543,53 @@ Game menu spec.)_
 > mobile clamp range (56px at 375px viewport) under the existing media query.
 ```
 
+### [x] 6.2 — Replace abstract shape pieces with real chess pieces
+
+**Reads:** `src/components/Piece.jsx`, `src/game/placement.js`, `src/game/config.js`
+**Creates/Modifies:** `src/game/config.js`, `src/game/placement.js`, `src/game/useGameSession.js`,
+`src/components/Piece.jsx`, `src/components/Piece.css`, `src/components/ChessBoard.jsx`,
+`src/screens/CustomProperties.jsx`, `src/screens/CustomMode.jsx`,
+`src/screens/exercises/PlacementBoardExercise.jsx`, `src/screens/exercises/MovesExercise.jsx`,
+`src/screens/exercises/FlashesExercise.jsx`, `src/screens/exercises/SuperMovesExercise.jsx`,
+`src/screens/Help.jsx`
+**Requirements:**
+- Pieces should look like a real chess set (random mixture of white and black
+  king/queen/rook/bishop/knight/pawn), not abstract colored shapes
+- Still no copyrighted image assets (CLAUDE.md non-negotiable rule #2)
+**Done when:**
+- Every exercise renders real chess-piece glyphs, correctly split white/black
+- Existing "piece colors" custom property still makes sense under the new model
+
+```
+> Note: Asked the user how the existing 8-swatch "Default piece colors"
+> Custom Properties setting should behave once pieces are real chess pieces
+> (only two sides exist, not 8 arbitrary colors) - they chose to repurpose it
+> rather than remove it or keep 8-color tinting. Implementation: pieces are
+> drawn from the standard Unicode chess symbols (U+2654-U+265F) - free text
+> characters, not imported artwork, same "no copyrighted assets" guarantee
+> the old shape glyphs had. generatePieces() now returns {type, side} per
+> piece (type = king/queen/rook/bishop/knight/pawn, side = white/black),
+> drawn from a shuffled deck of up to 12 unique (type, side) combinations so
+> pieces stay visually distinct on a board the same way the old 8-shape/
+> 8-color system did up to 8 pieces. The "Default piece colors" 8-swatch
+> picker (defaultPieceColors) is replaced by defaultPieceSideMode
+> ('mixed' | 'white' | 'black') in both Custom Properties and Custom Mode.
+> Old stored settings degrade safely with no migration code needed -
+> loadSettings() already merges saved settings onto DEFAULT_CUSTOM_PROPERTIES,
+> so a returning user without defaultPieceSideMode just gets 'mixed'.
+>
+> While wiring this up, found and fixed a real pre-existing bug: Piece.jsx
+> never imported Piece.css, so every rule in it (glyph sizing, hover/
+> selected/correct/incorrect states) was dead code - confirmed via `grep
+> piece dist/assets/*.css` returning zero matches before the fix and the
+> full ruleset appearing after adding `import './Piece.css'`. This is very
+> likely the actual root cause of "pieces look far too small" (independent
+> of the shape-vs-chess-piece question) - live-verified afterward at
+> 1920px: glyph font-size clamp(2.4rem, 7.5vw, 4.75rem) resolves to the
+> 76px ceiling against a 112px square (~68% fill), matching real chess-set
+> proportions, vs. an unstyled ~13px before the fix.
+```
+
 ---
 
 # Known follow-ups (not blocking, not in original spec scope)
