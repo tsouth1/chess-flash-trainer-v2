@@ -17,11 +17,11 @@
 }
 
 .piece--md .piece__glyph {
-  font-size: clamp(1.1rem, 4.5vw, 2rem);
+  font-size: clamp(1.6rem, 6vw, 3.25rem);
 }
 
 .piece--sm .piece__glyph {
-  font-size: 1rem;
+  font-size: 1.5rem;
 }
 
 .piece:hover {

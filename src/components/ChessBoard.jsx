@@ -135,18 +135,19 @@ function ChessBoard({
     rows.push(
       <div className="board-row" key={row}>
         {showCoordinates && <span className="board-rank-label">{boardSize - row}</span>}
-        <div className="board-row__squares" style={{ gridTemplateColumns: `repeat(${boardSize}, 1fr)` }}>
-          {cells}
-        </div>
+        <div className="board-row__squares">{cells}</div>
       </div>,
     )
   }
 
   return (
-    <div className="board-wrapper" role="group" aria-label={label}>
+    // --cols drives every grid track size (see ChessBoard.css) so the board's
+    // pixel size depends only on boardSize + viewport width - never on how
+    // many pieces currently happen to be on the board.
+    <div className="board-wrapper" role="group" aria-label={label} style={{ '--cols': boardSize }}>
       <div className="board-rows">{rows}</div>
       {showCoordinates && (
-        <div className="board-file-labels" style={{ gridTemplateColumns: `2ch repeat(${boardSize}, 1fr)` }}>
+        <div className="board-file-labels">
           <span />
           {Array.from({ length: boardSize }, (_, col) => (
             <span key={col}>{String.fromCharCode(65 + col)}</span>

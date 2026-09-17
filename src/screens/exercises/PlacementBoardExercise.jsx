@@ -187,7 +187,7 @@ function PlacementBoardExercise({ exercise, levelId, customConfig, transpose = f
             >
               {tray.length === 0 && <span className="sr-only">All pieces placed.</span>}
               {tray.map((p) => (
-                <span key={p.id} style={{ width: '2.4rem', height: '2.4rem' }}>
+                <span key={p.id} style={{ width: '3.2rem', height: '3.2rem', flex: 'none' }}>
                   <Piece
                     id={p.id}
                     color={p.color}

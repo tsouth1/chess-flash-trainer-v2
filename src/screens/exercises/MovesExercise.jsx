@@ -154,7 +154,7 @@ function MovesExercise({ levelId, customConfig }) {
               <h3 style={{ marginTop: 0 }}>Pieces to place</h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', justifyContent: 'center' }} role="group" aria-label="Unplaced pieces">
                 {tray.map((p) => (
-                  <span key={p.id} style={{ width: '2.4rem', height: '2.4rem' }}>
+                  <span key={p.id} style={{ width: '3.2rem', height: '3.2rem', flex: 'none' }}>
                     <Piece
                       id={p.id}
                       color={p.color}
