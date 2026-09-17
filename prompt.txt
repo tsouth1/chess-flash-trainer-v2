@@ -1,0 +1,478 @@
+You are an expert React and JavaScript developer. Create a complete, polished web application inspired by the classic “KGB’s Secrets” memory and concentration brain game.
+
+Build the app with:
+
+- React
+- JavaScript
+- Vite
+- Functional components and React hooks
+- CSS or CSS modules
+- Browser localStorage for persistence
+- Responsive desktop and tablet layouts
+- No backend required
+- No external authentication required
+
+The application should be called “KGB’s Secrets” and should have a retro-inspired strategy-game visual style while remaining modern, accessible, and easy to use.
+
+## Core concept
+
+The application contains memory exercises using a chessboard and colored chess pieces.
+
+The player must:
+
+1. Click “Start”.
+2. Observe the chessboard and memorize the positions of the pieces.
+3. Click “OK” to hide or alter the board according to the selected exercise.
+4. Reconstruct the original or transformed piece positions.
+5. Click “OK” again to submit the answer.
+6. Receive immediate feedback showing whether the answer was correct.
+7. Optionally click “Answer” to reveal the correct solution.
+
+The pieces are memory-game objects, not standard chess pieces. Their movement does not need to follow chess rules unless required by the selected exercise.
+
+## User management
+
+Create a startup screen called “Personal Data”.
+
+The user should be able to:
+
+- Enter a username.
+- Select an existing username.
+- Add a new user.
+- Start the game.
+- Delete a user.
+- View the currently selected user.
+
+Support two application modes:
+
+- Personal edition: maximum of 1 user.
+- Multiuser edition: maximum of 10 users.
+
+For this implementation, default to multiuser mode, but define a configurable constant that can switch between personal and multiuser mode.
+
+If a user exceeding the maximum limit is added, remove the oldest user and delete that user’s saved results, matching the original game behavior.
+
+Persist users, settings, progress, statistics, levels, and achievements in localStorage.
+
+## Application screens
+
+Create the following screens or views:
+
+1. Personal Data
+2. Main Game
+3. Custom Properties
+4. Statistics
+5. Best Intelligencers
+6. Help
+7. Level Selection
+
+Use either React Router or a simple state-based view system.
+
+## Main navigation
+
+Create a menu bar with:
+
+### Game menu
+
+- New
+- Statics
+- Transposition
+- Flashes
+- Moves
+- Super Moves
+- Custom...
+- Custom Properties...
+- Levels...
+- Statistics...
+- Best Intelligencers...
+- Exit
+
+### Help menu
+
+- Help
+- About
+
+The menu should work on desktop and collapse into a responsive menu on smaller screens.
+
+“New” should stop the current game and return to the Personal Data screen.
+
+“Exit” should display a friendly message explaining that a browser application cannot close the browser window automatically, with an option to return to the Personal Data screen.
+
+## Exercise types
+
+Implement the following game modes.
+
+### 1. Statics
+
+- Display a chessboard with randomly positioned colored pieces.
+- The player clicks “Start” to begin.
+- The player memorizes the positions.
+- When the player clicks “OK”, remove all pieces from the board.
+- The player drags pieces back onto their original squares.
+- The player clicks “OK” to submit.
+- Compare the player’s arrangement with the original arrangement.
+- Show correct and incorrect results.
+- Display score, elapsed time, current level, and attempt number.
+
+### 2. Transposition
+
+- Display a chessboard with randomly positioned colored pieces.
+- After the player clicks the first “OK”, change the positions of the pieces once.
+- Allow the player to drag the pieces back to their original positions.
+- Let the player submit the answer.
+- Show the correct original arrangement and the player’s result.
+- Clearly indicate which pieces are misplaced.
+
+### 3. Flashes
+
+- Display a chessboard with pieces.
+- Continuously or repeatedly change the positions of the pieces.
+- The player must observe the board and decide when all pieces have returned to the initial arrangement.
+- Provide a button labeled “OK” for submitting the answer.
+- Include configurable flash speed and number of flashes.
+- Avoid making the exercise impossible or frustrating by providing reasonable defaults.
+- Highlight whether the player submitted at the correct moment.
+
+### 4. Moves
+
+This mode is available only in advanced editions.
+
+- Initially show the chessboard and pieces.
+- After the player clicks “OK”, hide the chessboard.
+- Display a list describing how each piece moves.
+- Each move must include:
+  - Piece identifier
+  - Number of squares
+  - Direction
+- The player mentally calculates the new positions.
+- After clicking “OK”, hide the move list and show the board again.
+- The player places the pieces on their calculated new positions.
+- The player clicks “OK” to submit.
+- Validate the final positions and show the result.
+
+Use directions such as:
+
+- Up
+- Down
+- Left
+- Right
+- Up-left
+- Up-right
+- Down-left
+- Down-right
+
+Keep pieces inside the board boundaries.
+
+### 5. Super Moves
+
+This mode is available only in advanced editions.
+
+- Initially show the chessboard and pieces.
+- After the first click on “OK”, hide the board and show the movement instructions.
+- After the second click on “OK”, hide the movement instructions.
+- Do not show the chessboard again automatically.
+- Instead, show a position-selection interface for each piece.
+- Let the player select coordinates such as “A1”, “E2”, or “H8”.
+- Require the player to select a new position for every piece.
+- After all positions are selected, allow the player to click “OK”.
+- Validate the final positions.
+- Clearly remind the player about the orientation of letters and numbers on the board.
+
+## Chessboard component
+
+Create a reusable ChessBoard component with:
+
+- Configurable board size, default 8x8.
+- Alternating light and dark squares.
+- Coordinate labels using letters and numbers.
+- Responsive sizing.
+- Drag-and-drop piece placement.
+- Click-to-select and click-to-place support for accessibility.
+- Keyboard-accessible controls.
+- Visual highlighting for:
+  - Selected square
+  - Valid drop locations
+  - Incorrect pieces
+  - Correct pieces
+  - Current piece being moved
+- Clear orientation so users understand coordinates.
+- Support for multiple colored pieces on different squares.
+- Prevent two pieces from occupying the same square unless the game rules explicitly allow it.
+
+Create a reusable Piece component with:
+
+- Unique ID
+- Color
+- Shape or chess-like icon
+- Accessible label
+- Drag-and-drop behavior
+- Selected state
+- Correct/incorrect state
+
+Use CSS shapes, Unicode chess symbols, or simple inline SVGs. Do not require copyrighted image assets.
+
+## Game state and flow
+
+Implement a clear finite-state game flow:
+
+- idle
+- memorizing
+- waitingForFirstConfirmation
+- transformation
+- solving
+- submitting
+- results
+
+The UI should always tell the player:
+
+- What they should do next
+- Which phase they are in
+- Which button is available
+- Whether the board or instructions are currently hidden
+- How many pieces remain to be placed
+
+Prevent invalid actions, such as submitting before all pieces have been positioned.
+
+## Levels
+
+Create a level system.
+
+Each level may control:
+
+- Board size
+- Number of pieces
+- Piece colors
+- Memorization duration
+- Number of flashes
+- Flash interval
+- Movement complexity
+- Whether advanced modes are unlocked
+
+Example levels:
+
+- Level 1: 4x4 board, 3 pieces
+- Level 2: 5x5 board, 4 pieces
+- Level 3: 6x6 board, 5 pieces
+- Level 4: 8x8 board, 6 pieces
+- Level 5: 8x8 board, 8 pieces
+
+Only completed levels should be selectable, except the first level, which should be unlocked by default.
+
+Store:
+
+- Current level
+- Completed levels
+- Best score per exercise
+- Number of attempts
+- Success rate
+- Average completion time
+
+## Custom mode
+
+Add a “Custom...” mode available in advanced editions.
+
+Allow the player to configure:
+
+- Exercise type
+- Board size
+- Number of pieces
+- Piece colors
+- Memorization time
+- Flash speed
+- Number of flashes
+- Movement difficulty
+- Whether coordinates are shown
+
+Add buttons for:
+
+- Start custom game
+- Reset settings
+- Cancel
+
+## Custom Properties screen
+
+Create a “Custom Properties” screen where users can permanently configure:
+
+- Board size
+- Default number of pieces
+- Default piece colors
+- Default exercise mode
+- Memorization duration
+- Flash interval
+- Sound effects on/off
+- Animation speed
+- Show coordinates on/off
+- Advanced edition on/off
+
+Validate all inputs and display helpful error messages.
+
+## Statistics screen
+
+Create a statistics dashboard showing:
+
+- Current user
+- Total games played
+- Total games completed
+- Successful games
+- Failed games
+- Success percentage
+- Best score
+- Average score
+- Average completion time
+- Best result for each exercise
+- Level progress
+- Recent game history
+
+Display recent sessions in a table with:
+
+- Date
+- Exercise
+- Level
+- Score
+- Success/failure
+- Time taken
+
+Add a “Clear Statistics” button with a confirmation dialog.
+
+## Best Intelligencers screen
+
+This screen is available only in multiuser mode.
+
+Display a leaderboard based on user performance.
+
+Include:
+
+- Username
+- Total score
+- Success rate
+- Best level
+- Games completed
+- Average score
+
+Allow sorting by score, success rate, and level.
+
+## Help screen
+
+Create a help page explaining:
+
+- How to start a game
+- How to memorize piece positions
+- How to drag and place pieces
+- How each exercise works
+- How levels work
+- How statistics work
+- How custom mode works
+- How to use board coordinates
+- Keyboard and accessibility controls
+
+Include a short “About” section describing the application as a memory and concentration training game.
+
+## Scoring system
+
+Create a scoring system based on:
+
+- Correctness
+- Number of pieces
+- Level
+- Time taken
+- Number of mistakes
+- Exercise difficulty
+
+Use a transparent scoring formula and show a breakdown after each game.
+
+Example:
+
+- Base score for correct placement
+- Bonus for completing without mistakes
+- Bonus for faster completion
+- Level multiplier
+- Penalty for incorrectly placed pieces
+
+Make sure the score is deterministic and easy to understand.
+
+## Accessibility
+
+Follow accessibility best practices:
+
+- Use semantic HTML.
+- Add labels to all buttons and controls.
+- Support keyboard navigation.
+- Make pieces usable without a mouse.
+- Use visible focus states.
+- Provide text alternatives for visual feedback.
+- Do not rely only on color to communicate correctness.
+- Ensure adequate color contrast.
+- Announce important game-state changes using an ARIA live region.
+
+## Visual design
+
+Use a polished, retro computer-game interface with:
+
+- Dark navy, charcoal, muted green, and amber accents.
+- Clear panels and bordered sections.
+- Subtle shadows.
+- Large readable controls.
+- A chessboard that is visually prominent.
+- Smooth but restrained animations.
+- Responsive layout.
+- A status bar showing:
+  - Current user
+  - Exercise
+  - Level
+  - Score
+  - Game phase
+
+Avoid clutter and ensure the game remains easy to understand.
+
+## Technical requirements
+
+Organize the project into reusable components, for example:
+
+- App
+- Layout
+- MenuBar
+- PersonalData
+- GameScreen
+- ChessBoard
+- Piece
+- GameControls
+- GameStatus
+- ExerciseSelector
+- LevelSelector
+- CustomMode
+- CustomProperties
+- Statistics
+- Leaderboard
+- Help
+- Modal
+- Toast
+- Storage utilities
+- Game-generation utilities
+- Scoring utilities
+
+Use separate utility functions for:
+
+- Random piece placement
+- Position comparison
+- Movement generation
+- Board boundary validation
+- Score calculation
+- Statistics aggregation
+- localStorage persistence
+
+Avoid putting all logic in one component.
+
+## Data model
+
+Use a data structure similar to:
+
+```js
+{
+  id: "piece-1",
+  color: "#d94f4f",
+  type: "circle",
+  position: {
+    row: 2,
+    col: 5
+  }
+}
