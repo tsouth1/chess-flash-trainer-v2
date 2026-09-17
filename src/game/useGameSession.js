@@ -33,7 +33,7 @@ export function useGameSession({ exercise, levelId, customConfig = null }) {
         flashCount: level.flashCount,
         flashIntervalMs: level.flashIntervalMs,
         movementComplexity: level.movementComplexity,
-        colors: settings.defaultPieceColors,
+        sideMode: settings.defaultPieceSideMode,
         showCoordinates: settings.showCoordinates,
       }
     }
@@ -44,7 +44,7 @@ export function useGameSession({ exercise, levelId, customConfig = null }) {
       flashCount: 5,
       flashIntervalMs: settings.flashIntervalMs,
       movementComplexity: 1,
-      colors: settings.defaultPieceColors,
+      sideMode: settings.defaultPieceSideMode,
       showCoordinates: settings.showCoordinates,
     }
   }, [customConfig, level, settings])

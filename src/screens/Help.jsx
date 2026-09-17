@@ -76,7 +76,8 @@ function Help() {
         <h2>How Custom mode works</h2>
         <p>
           Custom... (advanced edition) lets you configure a one-off game: exercise type, board size, piece count,
-          colors, memorization time, flash speed/count, movement difficulty, and whether coordinates are shown.
+          piece side (white/black/mixed), memorization time, flash speed/count, movement difficulty, and whether
+          coordinates are shown.
           Custom Properties... instead changes your <em>permanent</em> defaults used everywhere else.
         </p>
       </div>

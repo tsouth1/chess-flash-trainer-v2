@@ -1,4 +1,4 @@
-import { PIECE_COLORS, PIECE_SHAPES } from './config.js'
+import { PIECE_TYPES, PIECE_SIDES } from './config.js'
 
 /**
  * Random piece placement, position comparison, and boundary validation
@@ -25,15 +25,44 @@ export function randomPositions(boardSize, count) {
   return all.slice(0, count)
 }
 
-/** Build a fresh set of memory-game pieces at random, non-overlapping positions. */
-export function generatePieces(boardSize, count, colors = PIECE_COLORS) {
+/**
+ * Every (type, side) combination a piece can be - e.g. { type: 'king', side:
+ * 'white' }. `sideMode` narrows which side(s) are drawn from: 'white' or
+ * 'black' restricts to that side only, anything else ('mixed', undefined,
+ * ...) uses both. Shuffled with the same Fisher-Yates approach as positions.
+ */
+function buildPieceDeck(sideMode) {
+  const sides = sideMode === 'white' || sideMode === 'black' ? [sideMode] : PIECE_SIDES
+  const deck = []
+  sides.forEach((side) => {
+    PIECE_TYPES.forEach((type) => deck.push({ type, side }))
+  })
+  for (let i = deck.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[deck[i], deck[j]] = [deck[j], deck[i]]
+  }
+  return deck
+}
+
+/**
+ * Build a fresh set of memory-game pieces at random, non-overlapping
+ * positions. Each piece gets a random (type, side) combination - unique
+ * across the set whenever `count` fits within the deck (6 types x up to 2
+ * sides = up to 12 combinations), so no two pieces on the board look
+ * identical. Beyond that the deck cycles, same as the old shape/color system.
+ */
+export function generatePieces(boardSize, count, sideMode = 'mixed') {
   const positions = randomPositions(boardSize, count)
-  return positions.map((position, idx) => ({
-    id: `piece-${idx + 1}`,
-    color: colors[idx % colors.length],
-    type: PIECE_SHAPES[idx % PIECE_SHAPES.length],
-    position,
-  }))
+  const deck = buildPieceDeck(sideMode)
+  return positions.map((position, idx) => {
+    const { type, side } = deck[idx % deck.length]
+    return {
+      id: `piece-${idx + 1}`,
+      type,
+      side,
+      position,
+    }
+  })
 }
 
 /** Re-shuffle an existing set of pieces onto a new set of unique positions (used by Transposition/Flashes). */

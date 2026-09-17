@@ -1,24 +1,20 @@
 import React from 'react'
 
-// CSS-shape based piece rendering - no copyrighted chess-set imagery.
-// Each shape is drawn with plain CSS/SVG so the game never depends on
-// external image assets.
-
-const SHAPE_GLYPH = {
-  circle: '●',
-  triangle: '▲',
-  square: '■',
-  diamond: '◆',
-  star: '★',
-  hex: '⬡',
-  cross: '✚',
-  pentagon: '⬟',
+// Real chess pieces, drawn with the standard Unicode chess-symbol glyphs
+// (U+2654-U+265F) rather than an imported chess-set image - free text
+// characters, so the game never depends on external/copyrighted image
+// assets. White pieces use the hollow/outline glyphs, black pieces use the
+// solid glyphs; CSS (Piece.css) then colors and outlines each side so both
+// stay readable against the board's dark squares.
+const GLYPH = {
+  white: { king: '♔', queen: '♕', rook: '♖', bishop: '♗', knight: '♘', pawn: '♙' },
+  black: { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞', pawn: '♟' },
 }
 
 function Piece({
   id,
-  color,
-  type = 'circle',
+  side = 'white',
+  type = 'pawn',
   label,
   state, // 'selected' | 'correct' | 'incorrect' | undefined
   draggable = false,
@@ -28,10 +24,10 @@ function Piece({
   tabIndex = 0,
   size = 'md',
 }) {
-  const glyph = SHAPE_GLYPH[type] || SHAPE_GLYPH.circle
-  const accessibleLabel = label || `${type} piece`
+  const glyph = GLYPH[side]?.[type] || GLYPH.white.pawn
+  const accessibleLabel = label || `${side} ${type} piece`
 
-  const classNames = ['piece', `piece--${size}`]
+  const classNames = ['piece', `piece--${size}`, `piece--${side}`]
   if (state) classNames.push(`piece--${state}`)
 
   return (
@@ -40,7 +36,6 @@ function Piece({
       aria-label={accessibleLabel}
       tabIndex={onClick ? tabIndex : -1}
       className={classNames.join(' ')}
-      style={{ color }}
       draggable={draggable}
       data-piece-id={id}
       onDragStart={draggable ? (e) => onDragStart?.(e, id) : undefined}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useApp } from '../context/AppContext.jsx'
-import { EXERCISES, EXERCISE_LABELS, PIECE_COLORS } from '../game/config.js'
+import { EXERCISES, EXERCISE_LABELS, PIECE_SIDE_MODES, PIECE_SIDE_MODE_LABELS } from '../game/config.js'
 
 const EXERCISE_CHOICES = [EXERCISES.STATICS, EXERCISES.TRANSPOSITION, EXERCISES.FLASHES, EXERCISES.MOVES, EXERCISES.SUPER_MOVES]
 
@@ -46,12 +46,6 @@ function CustomProperties() {
     showToast('Custom properties saved.', 'success')
   }
 
-  const toggleColor = (color) => {
-    const has = form.defaultPieceColors.includes(color)
-    const next = has ? form.defaultPieceColors.filter((c) => c !== color) : [...form.defaultPieceColors, color]
-    update('defaultPieceColors', next)
-  }
-
   return (
     <div>
       <h1>Custom Properties</h1>
@@ -82,29 +76,18 @@ function CustomProperties() {
         </div>
 
         <div className="field">
-          <label>Default piece colors</label>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-            {PIECE_COLORS.map((color) => {
-              const active = form.defaultPieceColors.includes(color)
-              return (
-                <button
-                  type="button"
-                  key={color}
-                  onClick={() => toggleColor(color)}
-                  aria-pressed={active}
-                  aria-label={`Toggle color ${color}`}
-                  style={{
-                    width: '2rem',
-                    height: '2rem',
-                    borderRadius: '50%',
-                    background: color,
-                    border: active ? '3px solid var(--color-focus)' : '2px solid var(--color-border)',
-                    cursor: 'pointer',
-                  }}
-                />
-              )
-            })}
-          </div>
+          <label htmlFor="prop-piece-side-mode">Piece side</label>
+          <select
+            id="prop-piece-side-mode"
+            value={form.defaultPieceSideMode}
+            onChange={(e) => update('defaultPieceSideMode', e.target.value)}
+          >
+            {PIECE_SIDE_MODES.map((mode) => (
+              <option key={mode} value={mode}>
+                {PIECE_SIDE_MODE_LABELS[mode]}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="field">

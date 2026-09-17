@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useApp, VIEWS } from '../context/AppContext.jsx'
-import { EXERCISES, EXERCISE_LABELS, PIECE_COLORS, DEFAULT_CUSTOM_PROPERTIES } from '../game/config.js'
+import { EXERCISES, EXERCISE_LABELS, PIECE_SIDE_MODES, PIECE_SIDE_MODE_LABELS, DEFAULT_CUSTOM_PROPERTIES } from '../game/config.js'
 
 const EXERCISE_CHOICES = [EXERCISES.STATICS, EXERCISES.TRANSPOSITION, EXERCISES.FLASHES, EXERCISES.MOVES, EXERCISES.SUPER_MOVES]
 
@@ -9,7 +9,7 @@ function buildDefaultForm(settings) {
     exercise: EXERCISES.STATICS,
     boardSize: settings.boardSize,
     pieceCount: settings.defaultPieceCount,
-    colorCount: settings.defaultPieceColors.length,
+    pieceSideMode: settings.defaultPieceSideMode,
     memorizationSeconds: settings.memorizationSeconds,
     flashIntervalMs: settings.flashIntervalMs,
     flashCount: 5,
@@ -35,7 +35,7 @@ function CustomMode() {
     const customConfig = {
       boardSize: Number(form.boardSize),
       pieceCount: Number(form.pieceCount),
-      colors: PIECE_COLORS.slice(0, Number(form.colorCount)),
+      sideMode: form.pieceSideMode,
       memorizationSeconds: Number(form.memorizationSeconds),
       flashIntervalMs: Number(form.flashIntervalMs),
       flashCount: Number(form.flashCount),
@@ -91,15 +91,18 @@ function CustomMode() {
         </div>
 
         <div className="field">
-          <label htmlFor="custom-color-count">Piece colors ({form.colorCount})</label>
-          <input
-            id="custom-color-count"
-            type="range"
-            min={1}
-            max={PIECE_COLORS.length}
-            value={form.colorCount}
-            onChange={(e) => update('colorCount', Number(e.target.value))}
-          />
+          <label htmlFor="custom-piece-side-mode">Piece side</label>
+          <select
+            id="custom-piece-side-mode"
+            value={form.pieceSideMode}
+            onChange={(e) => update('pieceSideMode', e.target.value)}
+          >
+            {PIECE_SIDE_MODES.map((mode) => (
+              <option key={mode} value={mode}>
+                {PIECE_SIDE_MODE_LABELS[mode]}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="field">

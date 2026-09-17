@@ -22,7 +22,7 @@ function MovesExercise({ levelId, customConfig }) {
   const [showAnswer, setShowAnswer] = useState(false)
 
   const handleStart = () => {
-    const pieces = generatePieces(config.boardSize, config.pieceCount, config.colors)
+    const pieces = generatePieces(config.boardSize, config.pieceCount, config.sideMode)
     const { moves: moveList, resultingPieces } = generateMoveSet(pieces, config.boardSize, config.movementComplexity || 1)
     setStartPieces(pieces)
     setMoves(moveList)
@@ -126,7 +126,7 @@ function MovesExercise({ levelId, customConfig }) {
               const piece = startPieces.find((p) => p.id === m.pieceId)
               return (
                 <li key={m.pieceId}>
-                  {moveListDescription(m, `${piece?.type} piece (${piece?.color})`, DIRECTION_LABELS)}
+                  {moveListDescription(m, `${piece?.side} ${piece?.type} piece`, DIRECTION_LABELS)}
                 </li>
               )
             })}
@@ -157,9 +157,9 @@ function MovesExercise({ levelId, customConfig }) {
                   <span key={p.id} style={{ width: '3.2rem', height: '3.2rem', flex: 'none' }}>
                     <Piece
                       id={p.id}
-                      color={p.color}
+                      side={p.side}
                       type={p.type}
-                      label={`${p.type} piece, unplaced`}
+                      label={`${p.side} ${p.type} piece, unplaced`}
                       state={selectedPieceId === p.id ? 'selected' : undefined}
                       draggable
                       onDragStart={(e) => e.dataTransfer.setData('text/piece-id', p.id)}

@@ -25,7 +25,7 @@ function PlacementBoardExercise({ exercise, levelId, customConfig, transpose = f
   const [showAnswer, setShowAnswer] = useState(false)
 
   const handleStart = () => {
-    const pieces = generatePieces(config.boardSize, config.pieceCount, config.colors)
+    const pieces = generatePieces(config.boardSize, config.pieceCount, config.sideMode)
     setTargetPieces(pieces)
     setPlayerPositions({})
     setSelectedPieceId(null)
@@ -190,9 +190,9 @@ function PlacementBoardExercise({ exercise, levelId, customConfig, transpose = f
                 <span key={p.id} style={{ width: '3.2rem', height: '3.2rem', flex: 'none' }}>
                   <Piece
                     id={p.id}
-                    color={p.color}
+                    side={p.side}
                     type={p.type}
-                    label={`${p.type} piece, unplaced`}
+                    label={`${p.side} ${p.type} piece, unplaced`}
                     state={selectedPieceId === p.id ? 'selected' : undefined}
                     draggable
                     onDragStart={(e) => e.dataTransfer.setData('text/piece-id', p.id)}

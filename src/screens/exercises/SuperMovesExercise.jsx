@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import ChessBoard from '../../components/ChessBoard.jsx'
+import Piece from '../../components/Piece.jsx'
 import GameControls from '../../components/GameControls.jsx'
 import GameStatus from '../../components/GameStatus.jsx'
 import { useGameSession } from '../../game/useGameSession.js'
@@ -26,7 +27,7 @@ function SuperMovesExercise({ levelId, customConfig }) {
   const [duplicateError, setDuplicateError] = useState('')
 
   const handleStart = () => {
-    const pieces = generatePieces(config.boardSize, config.pieceCount, config.colors)
+    const pieces = generatePieces(config.boardSize, config.pieceCount, config.sideMode)
     const { moves: moveList, resultingPieces } = generateMoveSet(pieces, config.boardSize, config.movementComplexity || 2)
     setStartPieces(pieces)
     setMoves(moveList)
@@ -141,7 +142,7 @@ function SuperMovesExercise({ levelId, customConfig }) {
             {moves.map((m) => {
               const piece = startPieces.find((p) => p.id === m.pieceId)
               return (
-                <li key={m.pieceId}>{moveListDescription(m, `${piece?.type} piece (${piece?.color})`, DIRECTION_LABELS)}</li>
+                <li key={m.pieceId}>{moveListDescription(m, `${piece?.side} ${piece?.type} piece`, DIRECTION_LABELS)}</li>
               )
             })}
           </ul>
@@ -164,11 +165,23 @@ function SuperMovesExercise({ levelId, customConfig }) {
               {targetPieces.map((p) => (
                 <tr key={p.id}>
                   <td>
-                    <span style={{ color: p.color, fontWeight: 700 }}>{p.type}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <span style={{ width: '2.4rem', height: '2.4rem', flex: 'none' }}>
+                        <Piece
+                          id={p.id}
+                          side={p.side}
+                          type={p.type}
+                          size="sm"
+                          label={`${p.side} ${p.type} piece`}
+                          tabIndex={-1}
+                        />
+                      </span>
+                      <span className="sr-only">{`${p.side} ${p.type}`}</span>
+                    </span>
                   </td>
                   <td>
                     <label className="sr-only" htmlFor={`file-${p.id}`}>
-                      Column for {p.type} piece
+                      Column for {p.side} {p.type} piece
                     </label>
                     <select id={`file-${p.id}`} value={selections[p.id]?.file || ''} onChange={(e) => updateSelection(p.id, 'file', e.target.value)}>
                       <option value="" disabled>
@@ -183,7 +196,7 @@ function SuperMovesExercise({ levelId, customConfig }) {
                   </td>
                   <td>
                     <label className="sr-only" htmlFor={`rank-${p.id}`}>
-                      Row for {p.type} piece
+                      Row for {p.side} {p.type} piece
                     </label>
                     <select id={`rank-${p.id}`} value={selections[p.id]?.rank || ''} onChange={(e) => updateSelection(p.id, 'rank', e.target.value)}>
                       <option value="" disabled>

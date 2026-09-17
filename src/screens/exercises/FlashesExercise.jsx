@@ -52,7 +52,7 @@ function FlashesExercise({ levelId, customConfig }) {
   }
 
   const handleStart = () => {
-    const pieces = generatePieces(config.boardSize, config.pieceCount, config.colors)
+    const pieces = generatePieces(config.boardSize, config.pieceCount, config.sideMode)
     setOriginalPieces(pieces)
     setDisplayedPieces(pieces)
     setWasCorrect(null)

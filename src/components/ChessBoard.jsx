@@ -107,7 +107,7 @@ function ChessBoard({
           onDrop={(e) => handleDrop(e, { row, col })}
           aria-label={
             occupant
-              ? `Square ${coordinate}, occupied by ${occupant.type} piece${
+              ? `Square ${coordinate}, occupied by ${occupant.side} ${occupant.type} piece${
                   pieceStateMap[occupant.id] ? `, ${pieceStateMap[occupant.id]}` : ''
                 }`
               : `Square ${coordinate}, empty`
@@ -117,9 +117,9 @@ function ChessBoard({
           {occupant && (
             <Piece
               id={occupant.id}
-              color={occupant.color}
+              side={occupant.side}
               type={occupant.type}
-              label={`${occupant.type} piece at ${coordinate}`}
+              label={`${occupant.side} ${occupant.type} piece at ${coordinate}`}
               state={
                 selectedPieceId === occupant.id ? 'selected' : pieceStateMap[occupant.id] || undefined
               }

@@ -56,18 +56,31 @@ export const PHASE_LABELS = {
   [PHASES.RESULTS]: 'Results',
 }
 
-export const PIECE_COLORS = [
-  '#d94f4f', // red
-  '#4c8fd9', // blue
-  '#4caf7d', // green
-  '#e0a52c', // amber
-  '#a463d9', // violet
-  '#3fb8c4', // teal
-  '#e0729a', // pink
-  '#c7c04a', // olive
-]
+// Standard chess piece types, rendered as real king/queen/rook/bishop/knight/
+// pawn glyphs (see Piece.jsx) rather than abstract shapes.
+export const PIECE_TYPES = ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn']
 
-export const PIECE_SHAPES = ['circle', 'triangle', 'square', 'diamond', 'star', 'hex', 'cross', 'pentagon']
+export const PIECE_TYPE_LABELS = {
+  king: 'King',
+  queen: 'Queen',
+  rook: 'Rook',
+  bishop: 'Bishop',
+  knight: 'Knight',
+  pawn: 'Pawn',
+}
+
+// A chess piece only ever has two sides. `PIECE_SIDE_MODES` is the player-
+// facing setting (Custom Properties / Custom Mode) controlling which side(s)
+// generatePieces() draws from for a given game.
+export const PIECE_SIDES = ['white', 'black']
+
+export const PIECE_SIDE_MODES = ['mixed', 'white', 'black']
+
+export const PIECE_SIDE_MODE_LABELS = {
+  mixed: 'Mixed (random white & black)',
+  white: 'White pieces only',
+  black: 'Black pieces only',
+}
 
 export const DIRECTIONS = [
   'up',
@@ -94,7 +107,7 @@ export const DIRECTION_LABELS = {
 export const DEFAULT_CUSTOM_PROPERTIES = {
   boardSize: 8,
   defaultPieceCount: 6,
-  defaultPieceColors: PIECE_COLORS.slice(0, 6),
+  defaultPieceSideMode: 'mixed',
   defaultExercise: EXERCISES.STATICS,
   memorizationSeconds: 6,
   flashIntervalMs: 900,
