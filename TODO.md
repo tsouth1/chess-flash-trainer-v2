@@ -508,6 +508,43 @@ Game menu spec.)_
 
 ---
 
+# Post-launch fixes
+
+### [x] 6.1 — Board resized during play and rendered too small
+
+**Reads:** `src/components/ChessBoard.css`, `src/components/ChessBoard.jsx`
+**Creates/Modifies:** `src/components/ChessBoard.css`, `src/components/ChessBoard.jsx`,
+`src/components/Piece.css`, `src/screens/exercises/MovesExercise.jsx`,
+`src/screens/exercises/PlacementBoardExercise.jsx`
+**Requirements:**
+- The board must stay a fixed pixel size for the duration of a game, regardless
+  of how many pieces are currently placed on it
+- The board should read comfortably on a large hi-res monitor, not just fit a
+  small fixed max-width
+**Done when:**
+- Board square size is unaffected by adding/removing pieces
+- Board is visibly larger on a 1920px+ viewport than before
+
+```
+> Note: Root cause - .board-row__squares had no grid-template-columns of its
+> own (tracks were set inline per-row as bare `1fr`), and .board-square relied
+> on aspect-ratio with no explicit width. With no ancestor of definite width,
+> grid fell back to content-based (max-content) track sizing, so the board's
+> pixel size shifted based on piece glyph content as pieces were placed/
+> removed. Fixed by introducing --square-size (clamp(64px, 8vw, 112px),
+> viewport-driven only, never content-driven) and --cols (set from the
+> boardSize prop via inline style on the wrapper) as CSS custom properties,
+> used for every grid track and as explicit width/height on .board-square.
+> Also raised max-width from ~560px to 96vw and scaled up piece glyph/tray
+> sizing to match the larger board. Verified live on
+> https://tsouth1.github.io/chess-flash-trainer-v2/ at 1920x1080: square size
+> held at 112px (the clamp ceiling) through memorizing → clear → placing each
+> piece one-by-one → submit → results, and correctly scaled down to the
+> mobile clamp range (56px at 375px viewport) under the existing media query.
+```
+
+---
+
 # Known follow-ups (not blocking, not in original spec scope)
 
 - [ ] Add automated tests (Vitest) for `src/game/*` pure functions - the
