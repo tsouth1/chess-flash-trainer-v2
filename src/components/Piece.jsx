@@ -1,4 +1,5 @@
 import React from 'react'
+import './Piece.css'
 
 // Real chess pieces, drawn with the standard Unicode chess-symbol glyphs
 // (U+2654-U+265F) rather than an imported chess-set image - free text
