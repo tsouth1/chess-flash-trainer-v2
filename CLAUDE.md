@@ -14,6 +14,7 @@
 | **TODO.md** | Before starting any task — confirm what phase/task you're on |
 | **prompt.txt** | The original full feature spec. Source of truth for "is X in scope". |
 | **README.md** | Before changing how the project is run, built, or deployed |
+| **LICENSE.md** | Before touching `src/components/pieceGraphics.jsx`, or before adding any other third-party image/icon/font/audio asset |
 
 **Rule:** If a requirement in `prompt.txt` is ambiguous, make the most reasonable
 call, note the decision inline as a code comment, and record it in `TODO.md` under
@@ -38,9 +39,21 @@ flag it rather than reaching for a backend.
 
 1. **No backend, ever.** Pure static site — HTML/CSS/JS built by Vite, deployable
    as-is to GitHub Pages. No API routes, no server-rendered content.
-2. **No copyrighted assets.** Pieces are CSS shapes / Unicode glyphs / inline SVG
-   only — never imported chess-set images or third-party icon packs with unclear
-   licensing.
+2. **Every third-party asset needs a known, compatible license and a recorded
+   attribution — no "unclear licensing" imports, ever.** The one exception in
+   this project is `src/components/pieceGraphics.jsx`: the standard Wikimedia
+   Commons "Cburnett" chess piece SVG set, CC BY-SA 3.0 Unported, explicitly
+   approved for use here with the attribution recorded in `LICENSE.md`. That
+   approval is specific to that one asset — it is not a green light to import
+   other third-party art, icon packs, fonts, or audio without going through
+   the same process first: confirm the exact license, record the required
+   attribution in `LICENSE.md`, and flag any ShareAlike/copyleft term here
+   (see `LICENSE.md`'s ShareAlike notice — because `pieceGraphics.jsx` is a
+   CC BY-SA derivative, that one file is itself CC BY-SA 3.0, independent of
+   whatever license the rest of this project's code carries). When there's
+   any doubt about a new asset's license, don't import it — use a CSS shape,
+   a Unicode glyph, or original inline SVG instead, same as before this
+   piece set was approved.
 3. **localStorage is the only persistence layer.** All reads/writes to it go
    through `src/utils/storage.js` — never call `localStorage` directly from a
    component. This keeps schema versioning and error handling in one place.
@@ -161,6 +174,7 @@ chess-flash-trainer-v2/
 ├── SECURITY.md
 ├── TODO.md
 ├── README.md
+├── LICENSE.md                  ← third-party asset attribution (chess piece SVGs)
 ├── prompt.txt                  ← original feature spec
 ├── index.html
 ├── vite.config.js
@@ -170,7 +184,7 @@ chess-flash-trainer-v2/
     ├── main.jsx
     ├── App.jsx
     ├── context/                ← global state (users, settings, game FSM)
-    ├── components/              ← ChessBoard, Piece, MenuBar, Modal, Toast, ...
+    ├── components/              ← ChessBoard, Piece, pieceGraphics (CC BY-SA - see LICENSE.md), MenuBar, Modal, Toast, ...
     ├── screens/                 ← PersonalData, GameScreen, Statistics, ...
     ├── game/                    ← config, levels, placement, movement, scoring
     ├── utils/                   ← storage.js, statsAggregation.js

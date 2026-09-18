@@ -1,16 +1,15 @@
 import React from 'react'
 import './Piece.css'
+import { PIECE_SVGS } from './pieceGraphics.jsx'
 
-// Real chess pieces, drawn with the standard Unicode chess-symbol glyphs
-// (U+2654-U+265F) rather than an imported chess-set image - free text
-// characters, so the game never depends on external/copyrighted image
-// assets. White pieces use the hollow/outline glyphs, black pieces use the
-// solid glyphs; CSS (Piece.css) then colors and outlines each side so both
-// stay readable against the board's dark squares.
-const GLYPH = {
-  white: { king: '♔', queen: '♕', rook: '♖', bishop: '♗', knight: '♘', pawn: '♙' },
-  black: { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞', pawn: '♟' },
-}
+// Real chess pieces, drawn with the standard Cburnett chess-set SVG artwork
+// (see pieceGraphics.jsx for the full attribution and LICENSE.md at the
+// project root for the required CC BY-SA credit). Using real SVG stroke/fill
+// - rather than the CSS text-stroke trick the Unicode-glyph version relied
+// on - means white/black contrast is consistent in every browser, including
+// Firefox (which ignores -webkit-text-stroke).
+const SIDE_CODE = { white: 'w', black: 'b' }
+const TYPE_CODE = { king: 'K', queen: 'Q', rook: 'R', bishop: 'B', knight: 'N', pawn: 'P' }
 
 function Piece({
   id,
@@ -25,7 +24,7 @@ function Piece({
   tabIndex = 0,
   size = 'md',
 }) {
-  const glyph = GLYPH[side]?.[type] || GLYPH.white.pawn
+  const PieceSvg = PIECE_SVGS[`${SIDE_CODE[side] || 'w'}${TYPE_CODE[type] || 'P'}`] || PIECE_SVGS.wP
   const accessibleLabel = label || `${side} ${type} piece`
 
   const classNames = ['piece', `piece--${size}`, `piece--${side}`]
@@ -44,7 +43,7 @@ function Piece({
       onKeyDown={onClick ? (e) => onKeyDown?.(e, id) : undefined}
     >
       <span aria-hidden="true" className="piece__glyph">
-        {glyph}
+        <PieceSvg />
       </span>
       {state === 'correct' && <span className="sr-only"> - correctly placed</span>}
       {state === 'incorrect' && <span className="sr-only"> - incorrectly placed</span>}
