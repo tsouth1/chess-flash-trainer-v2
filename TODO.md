@@ -590,6 +590,61 @@ Game menu spec.)_
 > proportions, vs. an unstyled ~13px before the fix.
 ```
 
+### [x] 6.3 — Switch to real chess-set SVG artwork (Cburnett) for better contrast
+
+**Reads:** `LICENSE.md`, `src/components/pieceGraphics.jsx`
+**Creates/Modifies:** `LICENSE.md` (new), `src/components/pieceGraphics.jsx` (new),
+`src/components/Piece.jsx`, `src/components/Piece.css`, `CLAUDE.md`
+**Requirements:**
+- Black pieces must be clearly distinguishable from white pieces "in most
+  browsers" (user report: the 6.2 Unicode-glyph pieces were too dark/flat)
+- Any third-party artwork used needs a clear license and recorded attribution
+**Done when:**
+- Pieces render with real, browser-consistent white/black contrast
+- LICENSE.md documents the source, license, and required attribution
+- CLAUDE.md's asset-licensing rule reflects reality (no longer says "never
+  imported chess-set images")
+
+```
+> Note: Root cause of the 6.2 contrast complaint - black glyphs used
+> -webkit-text-stroke for their outline, a non-standard property Firefox
+> ignores entirely, so black pieces rendered as solid unreadable blobs there
+> (and looked flat even where it did work). I initially proposed drawing an
+> original piece set to sidestep any licensing question, but the user
+> explicitly chose instead to use the Cburnett SVG chess set directly and
+> asked me to document proper attribution.
+>
+> Verified the actual source and license before writing the attribution:
+> pulled Clariity/react-chessboard's src/pieces.tsx (MIT-licensed project),
+> whose own file header credits "en:User:Cburnett - CC BY-SA 3.0" with a
+> Wikimedia Commons curid link, corroborated independently via a third-party
+> attributions page. The user's draft attribution said "CC BY-SA 4.0" -
+> flagged and corrected to 3.0 (the version the actual source is under) in
+> LICENSE.md, while still including the user's supplementary "Sunny3113"
+> credit line verbatim as requested, noted as not the operative license for
+> this specific copy.
+>
+> Adapted programmatically (regex substitution over the fetched source, not
+> hand-retyped, to avoid corrupting path data): stripped TS typing, resolved
+> the `props?.fill` default to a literal per piece, and changed ONLY the
+> black pieces' `stroke` color from black to #e9e4d5 (light cream) - a real
+> SVG stroke works identically in every browser, unlike the CSS trick it
+> replaces. Geometry (path `d` data) is untouched. Result saved as
+> src/components/pieceGraphics.jsx with a full attribution header comment.
+>
+> Piece.jsx now renders the matching SVG component instead of a Unicode
+> character; Piece.css sizes it as a box (82%/88% of the square) instead of
+> a font-size. Added LICENSE.md with the full CC BY-SA notice, a ShareAlike
+> note (pieceGraphics.jsx is itself CC BY-SA 3.0 as a derivative), and
+> reworded CLAUDE.md rule #2 from a blanket "no copyrighted assets, never
+> imported chess-set images" to a specific policy: third-party assets need a
+> confirmed license + LICENSE.md attribution; this piece set is the one
+> approved exception, not a general opening for other third-party assets.
+> Live-verified on the deployed site: black piece SVG strokes render as
+> rgb(233,228,213) (not black), clearly legible against the dark board
+> squares; full game flow (memorize -> place -> submit) still works.
+```
+
 ---
 
 # Known follow-ups (not blocking, not in original spec scope)
