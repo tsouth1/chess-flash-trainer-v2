@@ -18,12 +18,13 @@
   letter-spacing: 0.03em;
 }
 
-.menu-bar__toggle {
-  display: none;
+.menu-bar__home {
+  flex: none;
 }
 
 .menu-bar__links {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
@@ -64,24 +65,8 @@
 }
 
 @media (max-width: 720px) {
-  .menu-bar__toggle {
-    display: inline-flex;
-  }
-
-  .menu-bar__links {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    flex-direction: column;
-    background: var(--color-navy);
-    border-bottom: 2px solid var(--color-border-strong);
-    padding: 0.5rem;
-  }
-
-  .menu-bar__links--open {
-    display: flex;
+  .menu-bar {
+    flex-wrap: wrap;
   }
 
   .menu-dropdown__list {

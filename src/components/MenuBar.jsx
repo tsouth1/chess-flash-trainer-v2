@@ -5,7 +5,6 @@ import './MenuBar.css'
 
 function MenuBar() {
   const { navigate, settings, showToast, setPendingExercise } = useApp()
-  const [open, setOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState(null)
 
   const advancedRequired = (exercise) => {
@@ -29,7 +28,6 @@ function MenuBar() {
   }
 
   const closeAll = () => {
-    setOpen(false)
     setOpenMenu(null)
   }
 
@@ -46,15 +44,14 @@ function MenuBar() {
 
       <button
         type="button"
-        className="menu-bar__toggle btn btn-ghost"
-        aria-expanded={open}
-        aria-controls="menu-bar-links"
-        onClick={() => setOpen((v) => !v)}
+        className="menu-bar__home btn btn-ghost"
+        aria-label="Menu - return to level selection"
+        onClick={() => go(VIEWS.LEVELS)}
       >
         Menu
       </button>
 
-      <div id="menu-bar-links" className={`menu-bar__links ${open ? 'menu-bar__links--open' : ''}`}>
+      <div id="menu-bar-links" className="menu-bar__links">
         <div className="menu-dropdown">
           <button
             type="button"
