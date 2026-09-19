@@ -4,21 +4,22 @@ import Piece from '../../components/Piece.jsx'
 import GameControls from '../../components/GameControls.jsx'
 import GameStatus from '../../components/GameStatus.jsx'
 import { useGameSession } from '../../game/useGameSession.js'
-import { generatePieces, shufflePieces, comparePlacements, isSquareOccupied } from '../../game/placement.js'
+import { generatePieces, comparePlacements, isSquareOccupied } from '../../game/placement.js'
 import { PHASES } from '../../game/config.js'
 
 /**
- * Shared engine for the Statics and Transposition exercises. The two only
- * differ in whether the board is transformed once between memorizing and
- * solving (Transposition) or simply cleared (Statics).
+ * Statics exercise engine: memorize a placement, the board clears, then
+ * reconstruct the same placement from the tray. (Transposition used to
+ * share this engine via a `transpose` prop - it's now its own component,
+ * TranspositionExercise.jsx, since its timed multi-reveal + retry flow no
+ * longer fits this single-transform model. See TODO.md for the history.)
  */
-function PlacementBoardExercise({ exercise, levelId, customConfig, transpose = false }) {
+function PlacementBoardExercise({ exercise, levelId, customConfig }) {
   const session = useGameSession({ exercise, levelId, customConfig })
   const { phase, setPhase, config, attemptNumber, lastResult, beginTimer, finishGame, resetSession, selectedUser } =
     session
 
   const [targetPieces, setTargetPieces] = useState([])
-  const [transformedPieces, setTransformedPieces] = useState([])
   const [playerPositions, setPlayerPositions] = useState({}) // pieceId -> {row,col}
   const [selectedPieceId, setSelectedPieceId] = useState(null)
   const [comparison, setComparison] = useState(null)
@@ -36,22 +37,6 @@ function PlacementBoardExercise({ exercise, levelId, customConfig, transpose = f
   }
 
   const handleFirstOk = () => {
-    if (transpose) {
-      // The ORIGINAL arrangement (targetPieces) remains the correct answer.
-      // We briefly show one transformation of it, then clear the board -
-      // the player reconstructs the ORIGINAL layout from memory, the same
-      // way Statics does, which keeps the two engines' solving UX consistent
-      // (see TODO.md 4.2 note for the full rationale).
-      const transformed = shufflePieces(targetPieces, config.boardSize)
-      setTransformedPieces(transformed)
-      setPlayerPositions({})
-      setComparison(null)
-      setPhase(PHASES.TRANSFORMATION)
-      setTimeout(() => {
-        setPhase(PHASES.SOLVING)
-      }, 1200)
-      return
-    }
     setPlayerPositions({})
     setComparison(null)
     setPhase(PHASES.SOLVING)
@@ -115,13 +100,11 @@ function PlacementBoardExercise({ exercise, levelId, customConfig, transpose = f
   const boardPieces =
     phase === PHASES.MEMORIZING || phase === PHASES.WAITING_FIRST_CONFIRMATION
       ? targetPieces
-      : phase === PHASES.TRANSFORMATION
-        ? transformedPieces
-        : phase === PHASES.RESULTS && showAnswer
-          ? targetPieces
-          : targetPieces
-              .filter((p) => playerPositions[p.id])
-              .map((p) => ({ ...p, position: playerPositions[p.id] }))
+      : phase === PHASES.RESULTS && showAnswer
+        ? targetPieces
+        : targetPieces
+            .filter((p) => playerPositions[p.id])
+            .map((p) => ({ ...p, position: playerPositions[p.id] }))
 
   const tray = phase === PHASES.SOLVING ? targetPieces.filter((p) => !playerPositions[p.id]) : []
 
@@ -143,7 +126,6 @@ function PlacementBoardExercise({ exercise, levelId, customConfig, transpose = f
     [PHASES.IDLE]: 'Click Start to begin. Memorize the piece positions before they’re hidden.',
     [PHASES.MEMORIZING]: 'Memorize the board, then click OK when ready.',
     [PHASES.WAITING_FIRST_CONFIRMATION]: 'Click OK when ready to continue.',
-    [PHASES.TRANSFORMATION]: 'The pieces just moved once - watch closely.',
     [PHASES.SOLVING]: allPlaced
       ? 'All pieces placed. Click OK to submit your answer.'
       : `Place all ${targetPieces.length} pieces back onto their original squares. ${tray.length} remaining.`,
@@ -217,7 +199,7 @@ function PlacementBoardExercise({ exercise, levelId, customConfig, transpose = f
         onOk={phase === PHASES.SOLVING ? handleSecondOk : handleFirstOk}
         onAnswer={() => setShowAnswer((v) => !v)}
         onPlayAgain={handlePlayAgain}
-        onBackToLevels={handlePlayAgain}
+        onRestart={handlePlayAgain}
         okEnabled={okEnabled}
         okLabel={phase === PHASES.SOLVING ? 'Submit' : 'OK'}
         showAnswer={Boolean(comparison)}
