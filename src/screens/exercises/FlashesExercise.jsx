@@ -150,7 +150,7 @@ function FlashesExercise({ levelId, customConfig }) {
         onStart={handleStart}
         onOk={handleOk}
         onPlayAgain={handlePlayAgain}
-        onBackToLevels={handlePlayAgain}
+        onRestart={handlePlayAgain}
         okEnabled={phase === PHASES.TRANSFORMATION}
         okLabel="OK - This Is It!"
         showAnswer={false}

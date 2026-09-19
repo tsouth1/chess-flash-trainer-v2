@@ -229,7 +229,7 @@ function SuperMovesExercise({ levelId, customConfig }) {
         onOk={handleOk}
         onAnswer={() => setShowAnswer((v) => !v)}
         onPlayAgain={handlePlayAgain}
-        onBackToLevels={handlePlayAgain}
+        onRestart={handlePlayAgain}
         okEnabled={okEnabled}
         okLabel={phase === PHASES.SOLVING ? 'Submit' : 'OK'}
         showAnswer={Boolean(comparison)}

@@ -13,7 +13,7 @@ function GameControls({
   onOk,
   onAnswer,
   onPlayAgain,
-  onBackToLevels,
+  onRestart,
   okEnabled = false,
   okLabel = 'OK',
   showAnswer = false,
@@ -47,8 +47,8 @@ function GameControls({
             <button type="button" className="btn btn-primary" onClick={onPlayAgain}>
               Play Again
             </button>
-            <button type="button" className="btn btn-ghost" onClick={onBackToLevels}>
-              Back to Levels
+            <button type="button" className="btn btn-ghost" onClick={onRestart}>
+              Restart Level
             </button>
           </>
         )}
