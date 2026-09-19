@@ -645,6 +645,79 @@ Game menu spec.)_
 > squares; full game flow (memorize -> place -> submit) still works.
 ```
 
+### [x] 6.4 — Restart Level rename, Menu button fix, Transposition rebuild
+
+**Reads:** `src/components/GameControls.jsx`, `src/components/MenuBar.jsx`,
+`src/components/MenuBar.css`, `src/screens/exercises/PlacementBoardExercise.jsx`,
+`src/screens/exercises/TranspositionExercise.jsx`
+**Creates/Modifies:** `src/components/GameControls.jsx`, `src/components/MenuBar.jsx`,
+`src/components/MenuBar.css`, `src/screens/exercises/FlashesExercise.jsx`,
+`src/screens/exercises/MovesExercise.jsx`, `src/screens/exercises/SuperMovesExercise.jsx`,
+`src/screens/exercises/PlacementBoardExercise.jsx`, `src/screens/exercises/StaticsExercise.jsx`,
+`src/screens/exercises/TranspositionExercise.jsx` (rewritten)
+**Requirements:**
+- The results-screen button labeled "Back to Levels" actually just restarted the
+  current level - rename it to "Restart Level" to match its real behavior
+- The "Menu" button did nothing when clicked; it should return the player to
+  level selection
+- Transposition: show the initial piece layout, then reshuffle it into 3 new
+  random placements 5 seconds apart. One of those 3 (picked at random) is
+  flagged as the pattern the player must recreate; tell them which one
+  ("Recreate pattern # N"). A failed attempt offers a "Retry?" button against
+  the same target pattern; allow 3 retries before failing the player out of
+  the level.
+**Done when:**
+- Every exercise's results screen shows "Restart Level" instead of "Back to
+  Levels", and it does what it always did (restart the current level)
+- Clicking Menu from anywhere in a game navigates to Level Selection
+- Transposition follows the memorize -> 3 timed reshuffles -> recreate the
+  flagged pattern -> retry-on-failure (x3) -> fail-out flow described above
+
+```
+> Note: The "Back to Levels" button was wired to the exact same handler as
+> "Play Again" in all four exercise engines that used GameControls' results
+> row (Statics/Transposition via PlacementBoardExercise, Flashes, Moves,
+> Super Moves) - it never navigated to Levels at all. Renamed the button and
+> the `onBackToLevels` prop -> `onRestart` everywhere rather than changing
+> its behavior, since the user's ask was specifically to fix the misleading
+> label to match reality.
+>
+> Root cause of the "Menu does nothing" report: `.menu-bar__toggle` was
+> `display:none` by default and only appeared as a mobile hamburger under
+> `max-width:720px`, and even then it only toggled the Game/Help dropdowns'
+> visibility - it was never a navigation control. Repurposed it into an
+> always-visible "Menu" button that calls `navigate(VIEWS.LEVELS)` directly
+> (per the user's own stated expectation), and made the Game/Help dropdowns
+> always visible via `flex-wrap` instead of hidden behind the old toggle, so
+> removing the toggle doesn't regress narrow-viewport layout.
+>
+> Transposition's new timed-reveal + retry flow doesn't fit
+> PlacementBoardExercise's single-transform model (memorize once, one
+> shuffle, reconstruct), so it's been pulled out into its own component
+> (`TranspositionExercise.jsx`) instead of stretching the shared engine
+> further via more prop flags. PlacementBoardExercise goes back to being
+> Statics-only, dropping the now-dead `transpose` prop and its branches.
+>
+> Ambiguous spec calls made and recorded here per the CLAUDE.md rule:
+> - "Allow 3 retries" is read as 3 retries *after* the first attempt (so up
+>   to 4 total attempts at the flagged pattern) before the level fails - not
+>   3 attempts total.
+> - Scoring multiplier for Transposition set to 1.2, placed between Flashes'
+>   1.15 and Super Moves' 1.3 in the existing per-exercise difficulty scale,
+>   since the timed multi-reveal + retry format is harder than a single
+>   memorize/reconstruct but doesn't remove the board entirely the way
+>   Super Moves does.
+> - While `retryPending` (a failed attempt with retries left), only a
+>   "Retry?" control is shown - no Answer toggle, and Play Again/Restart are
+>   not offered - so a struggling player can't sidestep the retry by
+>   peeking at the answer or bailing out mid-attempt; a fully exhausted
+>   failure still goes through the normal Play Again/Restart results row.
+> Verified: `npm run build` and `npm run lint` both clean; live-verified on
+> the deployed site (button label, Menu navigation from inside a game, and
+> the full Transposition flow including a deliberate wrong attempt
+> triggering Retry, and retries exhausting into a terminal failure).
+```
+
 ---
 
 # Known follow-ups (not blocking, not in original spec scope)
