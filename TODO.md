@@ -718,6 +718,42 @@ Game menu spec.)_
 > triggering Retry, and retries exhausting into a terminal failure).
 ```
 
+### [x] 6.5 — Narrow games selection to Statics and Flashes only
+
+**Reads:** `src/screens/LevelSelection.jsx`, `src/components/MenuBar.jsx`
+**Creates/Modifies:** `src/screens/LevelSelection.jsx`, `src/components/MenuBar.jsx`
+**Requirements:**
+- The Level Selection screen's Exercise picker and the Menu bar's Game
+  dropdown should only offer Statics and Flashes
+**Done when:**
+- Both pickers show only Statics and Flashes
+- Nothing else regresses (Custom Mode, scoring, achievements, other screens)
+
+```
+> Note: Asked whether this meant hiding the other three exercises from
+> selection or deleting them outright - the user chose "hide from selection
+> UI only." Transposition, Moves, and Super Moves are untouched in
+> `src/screens/exercises/*` and GameScreen.jsx's ENGINES map still routes to
+> all five, so nothing is lost and this is trivially reversible (just add
+> the exercises back to `exerciseOptions` / the Game dropdown).
+>
+> Applied the narrowing in both places a player can pick a game - Level
+> Selection's Exercise tabs and the Menu bar's Game dropdown - since leaving
+> one of them showing all five while the other only shows two would be an
+> inconsistent half-measure. Left Custom Mode's exercise dropdown and Custom
+> Properties' "Default exercise mode" setting untouched, since those are a
+> separate advanced/power-user surface rather than "the games selection"
+> itself; happy to narrow those too if that turns out to be wanted.
+>
+> LevelSelection.jsx's `exercise` (the active tab) is now derived defensively
+> - if `pendingExercise.exercise` isn't one of the two visible options (e.g.
+> a stale value from before this change, or from Custom Mode), it falls back
+> to Statics instead of silently highlighting nothing. Also dropped the
+> now-dead `ADVANCED_ONLY_EXERCISES` gate in this screen's `chooseExercise`,
+> since Statics and Flashes were never advanced-only.
+> Verified: `npm run build` and `npm run lint` both clean.
+```
+
 ---
 
 # Known follow-ups (not blocking, not in original spec scope)
