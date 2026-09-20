@@ -74,23 +74,8 @@ function MenuBar() {
                 </button>
               </li>
               <li role="none">
-                <button role="menuitem" onClick={() => chooseExercise(EXERCISES.TRANSPOSITION)}>
-                  Transposition
-                </button>
-              </li>
-              <li role="none">
                 <button role="menuitem" onClick={() => chooseExercise(EXERCISES.FLASHES)}>
                   Flashes
-                </button>
-              </li>
-              <li role="none">
-                <button role="menuitem" onClick={() => chooseExercise(EXERCISES.MOVES)}>
-                  Moves
-                </button>
-              </li>
-              <li role="none">
-                <button role="menuitem" onClick={() => chooseExercise(EXERCISES.SUPER_MOVES)}>
-                  Super Moves
                 </button>
               </li>
               <li role="none">

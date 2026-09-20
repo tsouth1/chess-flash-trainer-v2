@@ -1,26 +1,25 @@
 import React, { useEffect, useState } from 'react'
 import { useApp, VIEWS } from '../context/AppContext.jsx'
 import { LEVELS, isLevelUnlocked } from '../game/levels.js'
-import { EXERCISES, EXERCISE_LABELS, ADVANCED_ONLY_EXERCISES } from '../game/config.js'
+import { EXERCISES, EXERCISE_LABELS } from '../game/config.js'
 import { loadAchievements } from '../utils/storage.js'
 
 function LevelSelection() {
-  const { selectedUser, settings, pendingExercise, setPendingExercise, navigate, showToast } = useApp()
+  const { selectedUser, pendingExercise, setPendingExercise, navigate, showToast } = useApp()
   const [completedLevels, setCompletedLevels] = useState([])
-  const exercise = pendingExercise?.exercise || EXERCISES.STATICS
 
   useEffect(() => {
     if (!selectedUser) return
     setCompletedLevels(loadAchievements(selectedUser.id).completedLevels || [])
   }, [selectedUser])
 
-  const exerciseOptions = Object.values(EXERCISES).filter((ex) => ex !== EXERCISES.CUSTOM)
+  // Only Statics and Flashes are offered here for now - Transposition, Moves,
+  // and Super Moves stay implemented (see GameScreen.jsx's ENGINES map) but
+  // are hidden from this picker per an explicit scope-narrowing request.
+  const exerciseOptions = [EXERCISES.STATICS, EXERCISES.FLASHES]
+  const exercise = exerciseOptions.includes(pendingExercise?.exercise) ? pendingExercise.exercise : EXERCISES.STATICS
 
   const chooseExercise = (ex) => {
-    if (ADVANCED_ONLY_EXERCISES.includes(ex) && !settings.advancedEdition) {
-      showToast('This mode requires the advanced edition. Enable it in Custom Properties.', 'warning')
-      return
-    }
     setPendingExercise({ exercise: ex })
   }
 
